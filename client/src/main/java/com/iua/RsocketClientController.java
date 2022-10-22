@@ -1,5 +1,6 @@
 package com.iua;
 
+import io.rsocket.RSocket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,14 +28,14 @@ public class RsocketClientController {
         this.rSocketRequester = builder.tcp("localhost", 7000);
     }
 
-    @GetMapping("/request-response")
-    public Mono<Notification> requestResponse() {
+    @GetMapping("/request-response") // Can without ResponseEntity
+    public ResponseEntity<Mono<Notification>> requestResponse() {
         Notification notification = new Notification(CLIENT, SERVER, "Test the Request-Response interaction model");
         logger.info("Send notification for my-request-response: " + notification);
-        return rSocketRequester
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(rSocketRequester
                 .route("my-request-response")
                 .data(notification)
-                .retrieveMono(Notification.class);
+                .retrieveMono(Notification.class));
     }
 
     @GetMapping("/fire-and-forget")
